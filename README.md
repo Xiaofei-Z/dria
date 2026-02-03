@@ -15,18 +15,18 @@
 使用以下命令一键安装：
 
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/Xiaofei-Z/deploy_nodes/main/Dria/install_dria.sh)
+bash <(curl -fsSL https://raw.githubusercontent.com/Xiaofei-Z/dria/main/install_dria.sh)
 ```
 
 ## 手动安装
 
 1. 克隆仓库:
    ```bash
-   git clone https://github.com/Xiaofei-Z/deploy_nodes.git
+   git clone https://github.com/Xiaofei-Z/dria.git
    ```
 2. 进入目录:
    ```bash
-   cd deploy_nodes/Dria
+   cd dria
    ```
 3. 运行脚本:
    ```bash
