@@ -15,16 +15,14 @@
 使用以下命令一键安装：
 
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/<your-github-username>/deploy_nodes/main/Dria/install_dria.sh)
+bash <(curl -fsSL https://raw.githubusercontent.com/Xiaofei-Z/deploy_nodes/main/Dria/install_dria.sh)
 ```
-
-> **注意**: 请将 `<your-github-username>` 替换为你的 GitHub 用户名。
 
 ## 手动安装
 
 1. 克隆仓库:
    ```bash
-   git clone https://github.com/<your-github-username>/deploy_nodes.git
+   git clone https://github.com/Xiaofei-Z/deploy_nodes.git
    ```
 2. 进入目录:
    ```bash
