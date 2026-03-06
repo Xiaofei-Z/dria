@@ -24,6 +24,20 @@ handle_error() {
 }
 trap 'handle_error $LINENO' ERR
 
+# 检查架构并设置兼容模式
+ARCH_PREFIX=""
+if [[ "$(uname -m)" == "arm64" ]]; then
+    log_warn "检测到 Apple Silicon (M1/M2/M3...) 芯片"
+    log_info "将使用 Rosetta 2 (x86_64) 模式运行以避免兼容性问题"
+    ARCH_PREFIX="arch -x86_64"
+    
+    # 检查 Rosetta 2 是否安装
+    if ! pkgutil --pkg-info=com.apple.pkg.RosettaUpdateAuto > /dev/null 2>&1; then
+        log_info "正在安装 Rosetta 2..."
+        softwareupdate --install-rosetta --agree-to-license
+    fi
+fi
+
 # 检查网络连接
 check_network() {
     log_info "正在检查网络连接..."
@@ -97,7 +111,11 @@ install_dria() {
         log_success "Dria 已安装"
     else
         log_info "正在下载并安装 Dria..."
-        curl -fsSL https://dria.co/launcher | bash
+        if [ -n "$ARCH_PREFIX" ]; then
+            $ARCH_PREFIX bash -c "$(curl -fsSL https://dria.co/launcher)"
+        else
+            curl -fsSL https://dria.co/launcher | bash
+        fi
         
         # 再次尝试加载环境
         if [ -f "$HOME/.zshrc" ]; then
@@ -137,6 +155,13 @@ echo -e "\${BLUE}========================================\${NC}"
 echo -e "\${BLUE}       🚀 Dria 计算节点启动器           \${NC}"
 echo -e "\${BLUE}========================================\${NC}"
 
+# 检查架构
+ARCH_PREFIX=""
+if [[ "\$(uname -m)" == "arm64" ]]; then
+    ARCH_PREFIX="arch -x86_64"
+    echo -e "\${YELLOW}⚠️  检测到 Apple Silicon，使用 Rosetta 2 模式运行...\${NC}"
+fi
+
 # 加载用户环境变量
 if [ -f "\$HOME/.zshrc" ]; then source "\$HOME/.zshrc"; fi
 if [ -f "\$HOME/.bashrc" ]; then source "\$HOME/.bashrc"; fi
@@ -163,7 +188,7 @@ if ! command -v dkn-compute-launcher &> /dev/null; then
 fi
 
 echo -e "\${GREEN}正在启动 Dria 节点...\${NC}"
-dkn-compute-launcher start
+\$ARCH_PREFIX dkn-compute-launcher start
 
 echo -e "\${RED}节点已停止\${NC}"
 read -n 1 -s -r -p "按任意键退出..."
@@ -210,7 +235,7 @@ main() {
     
     # 尝试直接启动，如果失败则提示使用桌面图标
     if command -v dkn-compute-launcher &> /dev/null; then
-        dkn-compute-launcher start
+        $ARCH_PREFIX dkn-compute-launcher start
     else
         log_warn "无法在当前 Shell 启动节点，请双击桌面的 [Start_Dria_Node.command] 图标启动。"
     fi
