@@ -31,6 +31,10 @@ if [[ "$(uname -m)" == "arm64" ]]; then
     log_info "将使用 Rosetta 2 (x86_64) 模式运行以避免兼容性问题"
     ARCH_PREFIX="arch -x86_64"
     
+    # 强制设置环境变量以欺骗检测脚本
+    export DKN_ARCH="x86_64"
+    export ARCH="x86_64"
+    
     # 检查 Rosetta 2 是否安装
     if ! pkgutil --pkg-info=com.apple.pkg.RosettaUpdateAuto > /dev/null 2>&1; then
         log_info "正在安装 Rosetta 2..."
@@ -112,6 +116,11 @@ install_dria() {
     else
         log_info "正在下载并安装 Dria..."
         if [ -n "$ARCH_PREFIX" ]; then
+            # 强制伪装架构为 x86_64 进行安装
+            log_info "为 ARM64 架构设置 x86_64 兼容模式..."
+            # 导出环境变量强制 launcher 识别为 x86_64
+            export DKN_ARCH="x86_64"
+            export ARCH="x86_64"
             $ARCH_PREFIX bash -c "$(curl -fsSL https://dria.co/launcher)"
         else
             curl -fsSL https://dria.co/launcher | bash
@@ -160,6 +169,9 @@ ARCH_PREFIX=""
 if [[ "\$(uname -m)" == "arm64" ]]; then
     ARCH_PREFIX="arch -x86_64"
     echo -e "\${YELLOW}⚠️  检测到 Apple Silicon，使用 Rosetta 2 模式运行...\${NC}"
+    # 强制设置环境变量
+    export DKN_ARCH="x86_64"
+    export ARCH="x86_64"
 fi
 
 # 加载用户环境变量
